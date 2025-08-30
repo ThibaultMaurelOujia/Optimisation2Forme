@@ -1,11 +1,4 @@
-![qdsfs](qds.png)
+# Optimisation de Forme
 
+Petit projet de code C++ pour l'optimisation de forme en mécanique des fluides.
 
-# FSFDV
-
-qsdf
-
-## License
-
-
-sdf
