@@ -1,0 +1,105 @@
+# Domain & mesh
+Lx = 3
+Ly = 1
+
+# 32	64	96	128	256	384 	512	768	1024	2048 	4096
+
+Nx = 2048
+Ny = 2048
+
+# naca_2D.msh		naca_2D_HD.msh		grid_4.msh
+mesh_name = naca_2D.msh
+
+# Physical & time
+viscosity    = 1.8e-5
+Pr           = 0.71
+cfl_number   = 0.2
+#cfl_number   = 0.05
+#cfl_number   = 0.005
+final_time   = 10000.0
+save_interval = 10
+# density       pressure       pressure_coefficient       lift_coefficient       drag_coefficient       schlieren       vorticity       mach
+output_quantity = p
+verbosity = 1
+reload_config = 1000
+
+# Numerical schemes 
+advection_scheme  = compute_advection_weno3_HLLC
+# kelvin_helmholtz       one_x       sod_x       isentropic_vortex       blast_2d 	sin_cos
+# one_x 	one_x_vortex		one_x_density		one_x_temp
+initial_condition = one_x
+# periodic      inflow_outflow_x
+boundary_conditions = inflow_outflow_x
+#noise_level = 1e-2
+noise_level = 0
+inflow_velocity = 0.3
+
+
+
+
+
+
+
+
+
+inflow_velocity = 0.3
+#inflow_velocity = 0.5
+#inflow_velocity = 0.85
+#inflow_velocity = 1.05
+
+
+cfl_number   = 0.5
+#cfl_number   = 0.2
+#cfl_number   = 0.1
+#cfl_number   = 0.05
+#cfl_number   = 0.01
+
+
+
+
+
+
+state_load_path = results/test_save_test
+#state_save_path = results/test_save_test_
+
+
+
+shape_opt_enable = 1
+shape_param_file = mesh_opti/shape_params.txt
+shape_log_dir = mesh_opti
+
+
+
+final_time   = 0.010
+#final_time   = 0.001
+final_time   = 0.0001
+
+
+mesh_name = mesh_opti/naca_2D_shape_0.msh
+#mesh_name = mesh_opti/naca_2D_shape_1.msh
+#mesh_name = mesh_opti/naca_2D_shape_2.msh
+
+
+
+mesh_name = mesh_opti/naca_2D_shape_0_test.msh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
