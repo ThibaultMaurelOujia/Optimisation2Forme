@@ -40,7 +40,8 @@ void apply_diffusion_bc(const SimulationParams& params, const char boundaryCondi
 
 void apply_InterfaceStates_boundary_conditions(const SimulationParams& params, const char boundaryCondition, 
     double  rho_L, double  rho_u_L, double  rho_v_L, double  E_L, 
-    double& rho_R, double& rho_u_R, double& rho_v_R, double& E_R);
+    double& rho_R, double& rho_u_R, double& rho_v_R, double& E_R, 
+    double& nx, double& ny);
 
     
 } // namespace navier_stokes

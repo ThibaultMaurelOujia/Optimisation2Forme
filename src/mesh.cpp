@@ -251,6 +251,33 @@ Mesh::Mesh(const SimulationParams& params) {
     // debug_dump_cells("debug_cells.txt", 1.5, 2.0);
 
 
+{
+    std::ofstream ofs("debug_cells_edges.txt");
+    if(!ofs) {
+        std::cerr << "Erreur debug_cells_edges.txt\n";
+    } else {
+        ofs << std::fixed << std::setprecision(6);
+        for(std::size_t cid = 0; cid < this->cells.size(); ++cid) {
+            const auto& cell = this->cells[cid];
+            
+            ofs << cell.centre.x << "," << cell.centre.y;
+            
+            for(auto eid : cell.edgeIDs) {
+                const auto& e = this->edges[eid];
+                const auto& pA = this->vertices[e.leftVertexID].p;
+                const auto& pB = this->vertices[e.rightVertexID].p;
+                double mx = 0.5*(pA.x + pB.x);
+                double my = 0.5*(pA.y + pB.y);
+                ofs << "," << mx << "," << my;
+            }
+            ofs << "\n";
+        }
+        ofs.close();
+        std::cout << "debug_cells_edges.txt\n";
+    }
+}
+
+
     gmsh::clear();
     gmsh::finalize();
 }

@@ -118,29 +118,39 @@ double getParamOrDefault(const std::vector<std::string>& names,
 }
 
 
-
 void appendShapeOptLog(const SimulationParams& params, const std::vector<std::string>& param_names,
                        double J_current, const std::vector<double>& grad) {
-    const std::string& dir = params.shape_log_dir;
-    if (dir.empty() || dir == "none") return;
+    const std::string& filepath = params.shape_log_file; 
 
-    std::filesystem::create_directories(dir);
-    const std::string path = (std::filesystem::path(dir) / "shape_opt.log").string();
+    if (!filepath.empty() && filepath != "none") {
+        namespace fs = std::filesystem;
 
-    std::ofstream out(path, std::ios::app);
-    if (!out) {
-        throw std::runtime_error("Impossible d'ouvrir le fichier log: " + path);
+        // Crée les dossiers si besoin 
+        fs::path p(filepath);
+        if (!p.parent_path().empty()) {
+            std::error_code ec;
+            if (!fs::create_directories(p.parent_path(), ec) && ec) {
+                throw std::runtime_error("Impossible de créer le dossier: " + p.parent_path().string());
+            }
+        }
+
+        // Ouvre le fichier en écriture  
+        std::ofstream out(filepath);
+        if (!out) {
+            throw std::runtime_error("Impossible d'ouvrir " + filepath + " en écriture.");
+        }
+
+
+        out << std::fixed << std::setprecision(8);
+        out << " J=" << J_current;
+
+        // Gradients compacts: " m=-2.1635e+05 p=+1.23e+03 "
+        out << std::scientific << std::setprecision(6);
+        for (std::size_t k = 0; k < param_names.size(); ++k) {
+            out << ' ' << param_names[k] << '=' << grad[k];
+        }
+        out << '\n';
     }
-
-    out << std::fixed << std::setprecision(8);
-    out << " J=" << J_current;
-
-    // Gradients compacts: " m=-2.1635e+05 p=+1.23e+03 "
-    out << std::scientific << std::setprecision(6);
-    for (std::size_t k = 0; k < param_names.size(); ++k) {
-        out << ' ' << param_names[k] << '=' << grad[k];
-    }
-    out << '\n';
 }
 
 
@@ -267,8 +277,8 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_L = edge.rho_L - eps;
 
             if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -286,8 +296,8 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_u_L = edge.rho_u_L - eps;
 
             if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -305,8 +315,8 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_v_L = edge.rho_v_L - eps;
 
             if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -324,8 +334,8 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.E_L = edge.E_L - eps;
 
             if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -345,11 +355,11 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_R = edge.rho_R - eps;
 
             if (edge.boundaryCondition == 'w') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             } else if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -367,11 +377,11 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_u_R = edge.rho_u_R - eps;
 
             if (edge.boundaryCondition == 'w') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             } else if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -389,11 +399,11 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.rho_v_R = edge.rho_v_R - eps;
 
             if (edge.boundaryCondition == 'w') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             } else if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -411,11 +421,11 @@ void applyJacobianTranspose(Mesh& mesh, const SimulationParams& params,
             edge_minus.E_R = edge.E_R - eps;
 
             if (edge.boundaryCondition == 'w') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             } else if (edge.boundaryCondition != '\0') {
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R);
-                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_plus.rho_L, edge_plus.rho_u_L, edge_plus.rho_v_L, edge_plus.E_L, edge_plus.rho_R, edge_plus.rho_u_R, edge_plus.rho_v_R, edge_plus.E_R, edge_plus.edgeNormal.x, edge_plus.edgeNormal.y);
+                apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge_minus.rho_L, edge_minus.rho_u_L, edge_minus.rho_v_L, edge_minus.E_L, edge_minus.rho_R, edge_minus.rho_u_R, edge_minus.rho_v_R, edge_minus.E_R, edge_minus.edgeNormal.x, edge_minus.edgeNormal.y);
             }
 
             compute_hllc_flux(edge_plus, params, edge_flux_rho_p, edge_flux_rho_u_p, edge_flux_rho_v_p, edge_flux_E_p);
@@ -541,6 +551,14 @@ void assembleAdjointRHS(Mesh& mesh, const SimulationParams& params,
         b_rho_u[iL] += coeff_CD * dp_dru;
         b_rho_v[iL] += coeff_CD * dp_drv;
         b_E[iL]     += coeff_CD * dp_dE;
+
+
+        if (edge.centre.x > 1.3) { // !!! test !!!
+            b_rho[iL]   += 0;
+            b_rho_u[iL] += 0;
+            b_rho_v[iL] += 0;
+            b_E[iL]     += 0;
+        }
     }
 }
 
@@ -902,7 +920,7 @@ double computeDirectObjectiveTerm(Mesh& mesh, const SimulationParams& params, do
         
         if (edge.boundaryCondition != 'w') continue;
 
-        // if (edge.centre.x > 1.34) continue; // !!! test !!!
+        if (edge.centre.x > 1.3) continue; // !!! test !!!
 
         const auto& n = edge.edgeNormal;
         double A = edge.edgeLength;
@@ -1017,12 +1035,15 @@ void optimizeShape(Mesh& mesh, const SimulationParams& params, double eps) {
 
     loadParamsGeneric(params.shape_param_file, param_names_all, param_values_all, param_names);
 
-    // std::cout << "[debug] param_names_all.size=" << param_names_all.size() << " param_values_all.size=" << param_values_all.size() << "\n";
-    // std::cout << "[debug] param_names (optimisés) = ";
-    // for (auto& s : param_names) std::cout << s << " ";
-    // std::cout << "\n";
+    if (params.verbosity>=2) {
+        std::cout << "[debug] param_names_all.size=" << param_names_all.size() << " param_values_all.size=" << param_values_all.size() << "\n";
+        std::cout << "[debug] param_names (optimisés) = ";
+        for (auto& s : param_names) std::cout << s << " ";
+        std::cout << "\n";
+    }
 
-    double beta = 1;
+    // double beta = 1;
+    const double beta = getParamOrDefault(param_names_all, param_values_all, "beta", 1);
 
     const double J_current = computeDirectObjectiveTerm(mesh, params, beta);
 

@@ -66,7 +66,7 @@ struct SimulationParams {
     bool        shape_opt_enable    = false;                    ///< false => désactivé
     // int         shape_opt_max_iters = 0;                        ///< 0 => pas d'itérations
     std::string shape_param_file    = "";                       ///< fichier d'entrée pour les paramètres ("" ou "none" => ignorer)
-    std::string shape_log_dir       = "";   ///< infos de sortie d'optimisation ("" ou "none" => ignorer)
+    std::string shape_log_file      = "";   ///< infos de sortie d'optimisation ("" ou "none" => ignorer)
     
     /// Calcule dx, dy et determine bc_ghost_layers selon advection_scheme.
     void finalize();

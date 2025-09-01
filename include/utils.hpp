@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include <omp.h>
 #include <gmsh.h>

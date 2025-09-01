@@ -5,6 +5,7 @@ namespace navier_stokes {
 
 void computeScalarGradientAdvection(Mesh& mesh, const SimulationParams& params){
 
+
     static std::vector<double> vertices_rho, vertices_rho_u, vertices_rho_v, vertices_E;
     static std::vector<double> edges_rho, edges_rho_u, edges_rho_v, edges_E;
     bool first = vertices_rho.empty();
@@ -136,10 +137,10 @@ void computeScalarGradientAdvection(Mesh& mesh, const SimulationParams& params){
     for (std::size_t i = 0; i < mesh.edges.size(); ++i) {
         Edge& edge = mesh.edges[i];
 
-        double rho   = 0.5 * (vertices_rho[edge.leftVertexID] + vertices_rho[edge.rightVertexID]);
+        double rho   = 0.5 * (vertices_rho[edge.leftVertexID]   + vertices_rho[edge.rightVertexID]);
         double rho_u = 0.5 * (vertices_rho_u[edge.leftVertexID] + vertices_rho_u[edge.rightVertexID]);
         double rho_v = 0.5 * (vertices_rho_v[edge.leftVertexID] + vertices_rho_v[edge.rightVertexID]);
-        double E     = 0.5 * (vertices_E[edge.leftVertexID] + vertices_E[edge.rightVertexID]); 
+        double E     = 0.5 * (vertices_E[edge.leftVertexID]     + vertices_E[edge.rightVertexID]); 
         
         if (edge.boundaryCondition == 'i' || edge.boundaryCondition == 'o' || edge.boundaryCondition == 'f' || edge.boundaryCondition == 'w') 
             apply_boundary_conditions(params, edge.boundaryCondition, rho, rho_u, rho_v, E);
@@ -229,7 +230,8 @@ static inline double computeVenkatAlpha(double phi_i, double phi_pred, double ph
 }
 
 void computeInterfaceStates(Mesh& mesh, const SimulationParams& params) {
-
+    // std::cout << "ATTENTION IL FAUT REMETTRE computeVenkatAlpha" << '\n' << std::flush;
+    
     auto t_inter = time_tic();
     #pragma omp parallel for 
     for (std::size_t cid = 0; cid < mesh.cells.size(); ++cid) {
@@ -304,7 +306,7 @@ void computeInterfaceStates(Mesh& mesh, const SimulationParams& params) {
                 edge.E_L     = cell.E     + alpha_E * (cell.E_x * distance_x + cell.E_y * distance_y);
                 if (edge.boundaryCondition == 'i' || edge.boundaryCondition == 'o' || edge.boundaryCondition == 'f' || edge.boundaryCondition == 'w') {
                     double rho = edge.rho_L, rho_u = edge.rho_u_L, rho_v = edge.rho_v_L, E = edge.E_L;
-                    apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge.rho_L, edge.rho_u_L, edge.rho_v_L, edge.E_L, edge.rho_R, edge.rho_u_R, edge.rho_v_R, edge.E_R);
+                    apply_InterfaceStates_boundary_conditions(params, edge.boundaryCondition, edge.rho_L, edge.rho_u_L, edge.rho_v_L, edge.E_L, edge.rho_R, edge.rho_u_R, edge.rho_v_R, edge.E_R, edge.edgeNormal.x, edge.edgeNormal.y);
                 }
             }
             else if (edge.rightCellID == cid) {
@@ -549,6 +551,58 @@ void computeAdvectionTerm(Mesh& mesh, const SimulationParams& params) {
 //     }
 // }
 
+
+
+
+
+    // std::cout << "vertices_rho[1] " << vertices_rho[1] << " vertices_rho_u[1] " << vertices_rho_u[1] 
+    //           << " vertices_rho_v[1] " << vertices_rho_v[1] << " vertices_E[1] " << vertices_E[1] << '\n' << std::flush;
+
+    // std::cout << "vertices_rho[208] " << vertices_rho[208] << " vertices_rho_u[208] " << vertices_rho_u[208] 
+    //           << " vertices_rho_v[208] " << vertices_rho_v[208] << " vertices_E[208] " << vertices_E[208] << '\n' << std::flush;
+
+    // vertices_rho[1]   = vertices_rho[208];
+    // vertices_rho_u[1] = vertices_rho_u[208];
+    // vertices_rho_v[1] = vertices_rho_v[208];
+    // vertices_E[1]     = vertices_E[208];
+
+
+
+    // // mesh.cells[21413].rho   = mesh.cells[21414].rho;
+    // // mesh.cells[21413].rho_u = mesh.cells[21414].rho_u;
+    // // mesh.cells[21413].rho_v = mesh.cells[21414].rho_v;
+    // // mesh.cells[21413].E     = mesh.cells[21414].E;
+
+    // // mesh.cells[25196].rho   = mesh.cells[25157].rho;
+    // // mesh.cells[25196].rho_u = mesh.cells[25157].rho_u;
+    // // mesh.cells[25196].rho_v = mesh.cells[25157].rho_v;
+    // // mesh.cells[25196].E     = mesh.cells[25157].E;
+
+    // mesh.cells[5184].rho   = mesh.cells[5160].rho;
+    // mesh.cells[5184].rho_u = mesh.cells[5160].rho_u;
+    // mesh.cells[5184].rho_v = mesh.cells[5160].rho_v;
+    // mesh.cells[5184].E     = mesh.cells[5160].E;
+    // mesh.cells[5208].rho   = mesh.cells[5184].rho;
+    // mesh.cells[5208].rho_u = mesh.cells[5184].rho_u;
+    // mesh.cells[5208].rho_v = mesh.cells[5184].rho_v;
+    // mesh.cells[5208].E     = mesh.cells[5184].E;
+    // mesh.cells[5232].rho   = mesh.cells[5208].rho;
+    // mesh.cells[5232].rho_u = mesh.cells[5208].rho_u;
+    // mesh.cells[5232].rho_v = mesh.cells[5208].rho_v;
+    // mesh.cells[5232].E     = mesh.cells[5208].E;
+
+    // mesh.cells[2831].rho   = mesh.cells[2830].rho;
+    // mesh.cells[2831].rho_u = mesh.cells[2830].rho_u;
+    // mesh.cells[2831].rho_v = mesh.cells[2830].rho_v;
+    // mesh.cells[2831].E     = mesh.cells[2830].E;
+    // mesh.cells[6101].rho   = mesh.cells[2831].rho;
+    // mesh.cells[6101].rho_u = mesh.cells[2831].rho_u;
+    // mesh.cells[6101].rho_v = mesh.cells[2831].rho_v;
+    // mesh.cells[6101].E     = mesh.cells[2831].E;
+    // mesh.cells[6102].rho   = mesh.cells[6101].rho;
+    // mesh.cells[6102].rho_u = mesh.cells[6101].rho_u;
+    // mesh.cells[6102].rho_v = mesh.cells[6101].rho_v;
+    // mesh.cells[6102].E     = mesh.cells[6101].E;
 
 
 

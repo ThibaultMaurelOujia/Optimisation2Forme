@@ -1,12 +1,14 @@
 
 SetFactory("OpenCASCADE");
 
+// gmsh naca_2D_shape_0.geo -2 -format msh2 -o naca_2D_shape_0.msh
+
 N_fact = 2;
 
 // Parametres
 c   = 1.0;		// corde
-m   = 0.02; 		// cambrure max  
-p   = 0.4;		// position cambrure 
+m   = 0.00200000; 		// cambrure max  
+p   = 0.39000000;		// position cambrure 
 t   = 0.12; 		// epaisseur relative
 N   = 200;		// nombre de points demi profil
 lc  = 0.01;		// taille de maillage
@@ -42,39 +44,6 @@ For i In {0:N-1}
 EndFor
 
 
-// { 0.008, -0.006, 0.0 } 
-Translate { 0.0002, -0.0016, 0.0 } {
-  Point{N};
-}
-Translate { -0.0002,  0.0016, 0.0 } {
-  Point{N+1};
-}
-Translate { 0.0002, -0.0004, 0.0 } {
-  Point{N-1};
-}
-Translate { 0.0000,  0.0002, 0.0 } {
-  Point{N+2};
-}
-
-Rotate { {0,0,1}, {0,0,0}, alpha } {
-  Point{1:2*N-1};
-}
-//Translate { -0.145, 0.0, 0.0 } {
-//  Point{1:2*N-1};
-//}
-
-//// Tracer spline
-//pts[] = {};
-//For i In {1:2*N-1}
-//  pts[] += i;
-//EndFor
-//pts[] += 1; 
-//Spline(1) = pts[];
-//Line Loop(1) = {1};
-//Plane Surface(1) = {1};
-
-
-
 
 
 
@@ -86,7 +55,7 @@ EndFor
 Spline(1) = pts1[];
 
 pts2[] = {};
-For i In {N:2*N-10} 
+For i In {N+1:2*N-10} 
   pts2[] += i;
 EndFor
 Spline(2) = pts2[];
@@ -126,7 +95,8 @@ Point(409) = {0.4-Sqrt(2)/2, +Sqrt(2)/2, 0, 1.0};
 Point(410) = {0.4-Sqrt(2-Sqrt(2))/2, -Sqrt(2+Sqrt(2))/2, 0, 1.0};
 //+
 Point(411) = {0.4-Sqrt(2-Sqrt(2))/2, +Sqrt(2+Sqrt(2))/2, 0, 1.0};
-
+//+
+Point(412) = {3, -0.002, 0, 0.0};
 
 
 //+
@@ -142,7 +112,11 @@ Line(8) = {403, 405};
 //+
 Line(9) = {404, 406};
 //+
-Line(40) = {405 , 406};
+Line(40) = {405 , 412};
+//+
+Line(41) = {N+1 , 412};
+//+
+Line(42) = {406 , 412};
 
 //+
 Line(11) = {400, 10};
@@ -151,9 +125,11 @@ Line(12) = {401, 2*N-10};
 //+
 Line(13) = {402, N};
 //+
-Line(14) = {403, N};
+Line(14) = {403, N+1};
 //+
 Line(15) = {N, 406};
+//+
+Line(16) = {N, N+1};
 
 
 
@@ -175,9 +151,13 @@ Curve Loop(4) = {15, -13, 7, 9};
 //+
 Plane Surface(4) = {4};
 //+
-Curve Loop(6) = {14, 15, -40, -8};
+Curve Loop(6) = {14, 41, -40, -8};
 //+
 Plane Surface(5) = {6};
+//+
+Curve Loop(7) = {41, -42, -15, 16};
+//+
+Plane Surface(6) = {7};
 
 
 //+
@@ -185,11 +165,11 @@ Physical Curve("Inlet", 41) = {4};
 //+
 Physical Curve("FreeStream", 42) = {5, 6, 7, 8};
 //+
-Physical Curve("Outlet", 43) = {9, 40};
+Physical Curve("Outlet", 43) = {9, 40, 42};
 //+
-Physical Curve("Airfoil", 44) = {3, 1, 2};
+Physical Curve("Airfoil", 44) = {3, 1, 2, 16};
 //+
-Physical Surface("Fluid", 45) = {1, 3, 2, 4, 5};
+Physical Surface("Fluid", 45) = {1, 3, 2, 4, 5, 6};
 
 
 
@@ -198,7 +178,7 @@ Transfinite Curve {11, 13, 12, 14, 9, 40} = N_fact * 25 Using Progression 0.94;
 //+
 Transfinite Curve {5, 6, 1, 2} = N_fact * 100 Using Progression 1;
 //+
-Transfinite Curve {7, 8, 15} = N_fact * 20 Using Progression 1.10;
+Transfinite Curve {7, 8, 15, 41} = N_fact * 20 Using Progression 1.10;
 //+
 Transfinite Curve {4, 3} = N_fact * 20 Using Progression 1;
 //+
@@ -213,6 +193,14 @@ Transfinite Surface {5};
 Transfinite Surface {2};
 //+
 Recombine Surface {1, 3, 2, 5, 4};
+//+
+Transfinite Curve {16, 42} = 1 Using Progression 1;
+//+
+Transfinite Surface {6};
+//+
+Recombine Surface {6};
+
+
 
 
 

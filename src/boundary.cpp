@@ -45,7 +45,7 @@ void apply_inflow_outflow_bc(const SimulationParams& params, const char boundary
 }
 
 
-void apply_InterfaceStates_boundary_conditions(const SimulationParams& params, const char boundaryCondition, double rho_L, double rho_u_L, double rho_v_L, double E_L, double& rho_R, double& rho_u_R, double& rho_v_R, double& E_R) {
+void apply_InterfaceStates_boundary_conditions(const SimulationParams& params, const char boundaryCondition, double rho_L, double rho_u_L, double rho_v_L, double E_L, double& rho_R, double& rho_u_R, double& rho_v_R, double& E_R, double& nx, double& ny) {
     rho_R    = rho_L;  
     rho_u_R  = rho_u_L;   
     rho_v_R  = rho_v_L;   
@@ -57,6 +57,25 @@ void apply_InterfaceStates_boundary_conditions(const SimulationParams& params, c
     else if (boundaryCondition == 'w') {
         rho_u_R = -rho_u_L;
         rho_v_R = -rho_v_L;
+
+        // double uL = rho_u_L / rho_L;
+        // double vL = rho_v_L / rho_L;
+
+        // double unL =  uL*nx + vL*ny;
+        // double utL = -uL*ny + vL*nx;
+
+        // double unR = -unL;
+        // double utR =  utL;
+
+        // double uR = unR*nx - utR*ny;
+        // double vR = unR*ny + utR*nx;
+
+        // double pL = (params.gamma-1.0)*(E_L - 0.5*rho_L*(uL*uL + vL*vL));
+        // double pR = pL;
+        // rho_R    = rho_L;
+        // rho_u_R  = rho_R * uR;
+        // rho_v_R  = rho_R * vR;
+        // E_R      = pR/(params.gamma-1.0) + 0.5*rho_R*(uR*uR + vR*vR);
     }
 }
 

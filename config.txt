@@ -17,7 +17,7 @@ cfl_number   = 0.2
 #cfl_number   = 0.05
 #cfl_number   = 0.005
 final_time   = 10000.0
-save_interval = 10
+save_interval = 1000
 # density       pressure       pressure_coefficient       lift_coefficient       drag_coefficient       schlieren       vorticity       mach
 output_quantity = p
 verbosity = 1
@@ -57,31 +57,22 @@ cfl_number   = 0.5
 
 
 
+final_time   = 0.01
+final_time   = 0.005
+#final_time   = 0.001
+#final_time   = 0.0001
 
 
-state_load_path = results/test_save_test
-#state_save_path = results/test_save_test_
 
 
+state_load_path = mesh_opti/naca_2D_flow_25
+state_save_path = mesh_opti/naca_2D_flow_26
 
 shape_opt_enable = 1
-shape_param_file = mesh_opti/shape_params.txt
-shape_log_dir = mesh_opti
+shape_param_file = mesh_opti/naca_2D_shape_params_25.txt
+shape_log_file = mesh_opti/shape_opt_25.log
 
-
-
-final_time   = 0.010
-#final_time   = 0.001
-final_time   = 0.0001
-
-
-mesh_name = mesh_opti/naca_2D_shape_0.msh
-#mesh_name = mesh_opti/naca_2D_shape_1.msh
-#mesh_name = mesh_opti/naca_2D_shape_2.msh
-
-
-
-mesh_name = mesh_opti/naca_2D_shape_0_test.msh
+mesh_name = mesh_opti/naca_2D_shape_25.msh
 
 
 

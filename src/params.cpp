@@ -74,7 +74,7 @@ bool load_config(const std::string &filename, SimulationParams &p) {
         else if (key == "shape_opt_enable")     ss >> p.shape_opt_enable;
         // else if (key == "shape_opt_max_iters")  ss >> p.shape_opt_max_iters;
         else if (key == "shape_param_file")     p.shape_param_file    = val;
-        else if (key == "shape_log_dir")        p.shape_log_dir       = val;
+        else if (key == "shape_log_file")       p.shape_log_file       = val;
  
     }
  
