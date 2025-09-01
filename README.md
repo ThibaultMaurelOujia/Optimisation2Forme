@@ -8,7 +8,7 @@
 - Viscosité constante.
 - Maillage Gmsh non structuré.
 - Schéma vertex-based.
-- Gradients: Green–Gauss.
+- Gradients: Green--Gauss.
 - Limiteur: Venkatakrishnan (option pour Barth–Jespersen).
 - Flux convectif: HLLC.
 - Avancement en temps: RK3 SSP.
@@ -17,8 +17,8 @@
 ## Optimisation adjointe
 - Adjoint discret.
 - Résolution adjoint: Eigen BiCGSTAB.
-- Fonction objectif: $J = -C_L + \\beta\, C_D$.
-- Portée: démontrer la chaîne adjoint → gradient de forme → mise à jour géométrique.
+- Fonction objectif: $J = -C_L + \beta C_D$.
+- Adjoint → gradient de forme → mise à jour géométrique.
 
 ## Portée et limitations
 - Code à visée pédagogique.
@@ -27,6 +27,6 @@
 - Diffusion numérique notable et maillages volontairement grossiers.
 
 ## Dépendances
-- [Eigen] (algèbre linéaire).
-- [Gmsh] (génération de maillage).
-- OpenMP pour le parallélisme CPU.
+- Eigen (algèbre linéaire).
+- Gmsh (génération de maillage).
+- OpenMP (parallélisme CPU).
