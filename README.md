@@ -7,7 +7,7 @@
 ## Description de la simulation
 - Navier–Stokes compressibles 2D (volumes finis).
 - Gaz parfait ($\gamma$ constant).
-- Viscosité constante.
+- Viscosité dynamique constante.
 - Maillage non structuré généré avec Gmsh.
 - Schéma vertex-based (interpolation cellule → sommet → arête).
 - Gradients par Green–Gauss.
@@ -17,10 +17,10 @@
 - Parallélisation OpenMP.
 
 ## Optimisation adjointe
-- Adjoint discret sans assemblage explicite de matrice (matrix-free).
+- Adjoint discret sans assemblage explicite de la jacobienne (matrix-free).
 - Résolution de l'adjoint avec Eigen BiCGSTAB.
 - Fonction objectif: $J = -C_L + \beta C_D$.
-- Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remeshing → ...
+- Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remaillage → ...
 
 ## Dépendances
 - Eigen (algèbre linéaire).
