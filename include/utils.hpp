@@ -21,7 +21,7 @@ namespace navier_stokes {
 
 
 inline constexpr double PI     = 3.14159265358979323846;
-inline constexpr double TWO_PI = 2.0 * PI;
+inline constexpr double TWO_PI = 2.0 * PI; 
 
 
 using Clock      = std::chrono::high_resolution_clock;

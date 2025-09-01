@@ -15,7 +15,7 @@ Simulator::Simulator(Mesh& mesh, const SimulationParams& params): mesh_(mesh), p
                                                             }
                                                         },
                                                         "Navier-Stokes"
-                                                    }, 
+                                                    },
                                                     img_{ sf::Vector2u{
                                                             static_cast<unsigned>(params.Nx),
                                                             static_cast<unsigned>(params.Ny)

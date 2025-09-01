@@ -9,7 +9,7 @@ void apply_inflow_outflow_bc(const SimulationParams& params, const char boundary
 
     double rho0  = params.rho_ref;
     double p0    = params.p_ref;
-    double M     = params.inflow_velocity; 
+    double M     = params.inflow_velocity;
     double a0    = std::sqrt(params.gamma*p0/rho0);
     double u0    = M*a0;
     double v0    = 0.0;
@@ -25,7 +25,7 @@ void apply_inflow_outflow_bc(const SimulationParams& params, const char boundary
     else if (boundaryCondition == 'o') { // outlet // on change rien
         // rho = rho, rho_u = rho_u, rho_v = rho_v, E = E;
     }
-    else if (boundaryCondition == 'f') { // freestream // far field
+    else if (boundaryCondition == 'f') { // freestream // far field 
         rho   = rho0;
         rho_u = rho0 * u0;
         rho_v = rho0 * v0;

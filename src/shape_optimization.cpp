@@ -6,15 +6,6 @@ namespace navier_stokes {
 
 
 
-
-
-
-
-
-
-
-
-
 /// 0) Lecture/écriture
 
 // trim
@@ -22,9 +13,9 @@ static inline void ltrim(std::string& s){ s.erase(s.begin(), std::find_if(s.begi
 static inline void rtrim(std::string& s){ s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char c){return !std::isspace(c);}).base(), s.end()); }
 static inline void trim(std::string& s){ ltrim(s); rtrim(s); }
 
-// Parse un fichier "clé (=|*=|espace) valeur"
-// - Remplit param_names_all, param_values_all 
-// - Remplit param_names, uniquement les clés marquées "*="
+// Parse un fichier "cléf (=|*=|espace) valeur"
+// Remplit param_names_all, param_values_all 
+// Remplit param_names, uniquement cléfs marquées "*="
 void loadParamsGeneric(const std::string& filepath,
                        std::vector<std::string>& param_names_all,  
                        std::vector<double>& param_values_all, 
@@ -41,9 +32,9 @@ void loadParamsGeneric(const std::string& filepath,
         throw std::runtime_error("Impossible d'ouvrir le fichier de paramètres: " + filepath);
     }
 
-    // position/index de chaque clé déjà vue dans param_names_all
+    // position/index de chaque cléf déjà vue dans param_names_all
     std::unordered_map<std::string, std::size_t> pos_of_key;
-    // ensemble des clés marquées à optimisées
+    // ensemble des cléfs marquées à optimisées
     std::unordered_set<std::string> is_opt;
 
     std::string line;
@@ -79,13 +70,13 @@ void loadParamsGeneric(const std::string& filepath,
 
         auto it = pos_of_key.find(key);
         if (it == pos_of_key.end()) {
-            // première occurrence de cette clé
+            // première occurrence de cette cléf
             std::size_t idx = param_names_all.size();
             pos_of_key[key] = idx;
             param_names_all.push_back(key);
             param_values_all.push_back(v);
         } else {
-            // clé déjà existante -> on remplace la valeur
+            // cléf déjà existante -> on remplace la valeur
             param_values_all[it->second] = v;
         }
 

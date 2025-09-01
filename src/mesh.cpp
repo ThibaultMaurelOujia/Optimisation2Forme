@@ -8,11 +8,11 @@ Mesh::Mesh(const SimulationParams& params) {
 
     gmsh::initialize();
     gmsh::option::setNumber("General.Terminal", 1);
-    gmsh::open(params.mesh_name); // "naca_2D.msh"
+    gmsh::open(params.mesh_name); // "naca_2D.msh" 
 
 
     std::map<Key,Value> edgeMap;
-    std::map<std::pair<std::size_t,std::size_t>, char> boundaryCondition;
+    std::map<std::pair<std::size_t,std::size_t>, char> boundaryCondition; 
 
     
     std::vector<std::size_t> nodeTags;

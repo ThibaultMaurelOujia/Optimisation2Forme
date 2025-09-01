@@ -10,7 +10,7 @@ void SimulationParams::finalize() {
 // trim whitespace from both ends of a string
 static inline std::string trim(const std::string &s) {
     auto first = s.find_first_not_of(" \t\r\n");
-    if (first == std::string::npos) return "";
+    if (first == std::string::npos) return ""; 
     auto last  = s.find_last_not_of (" \t\r\n");
     return s.substr(first, last - first + 1);
 }

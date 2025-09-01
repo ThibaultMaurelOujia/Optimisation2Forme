@@ -69,7 +69,7 @@ void computeScalarGradientAdvection(Mesh& mesh, const SimulationParams& params){
                 EV[k]     = c.E;
             }
 
-            std::array<vector_3D,4> U;
+            std::array<vector_3D,4> U; 
             std::array<double,4>    d; 
 
             for (int k = 0; k < 4; ++k) {
@@ -96,7 +96,7 @@ void computeScalarGradientAdvection(Mesh& mesh, const SimulationParams& params){
             }
 
             double wsum = std::accumulate(w.begin(), w.end(), 0.0);
-            for (double& wk : w) wk /= wsum;
+            for (double& wk : w) wk /= wsum; 
 
             vertices_rho[i]   = w[0]*rhoV[0]   + w[1]*rhoV[1]   + w[2]*rhoV[2]   + w[3]*rhoV[3];
             vertices_rho_u[i] = w[0]*rho_uV[0] + w[1]*rho_uV[1] + w[2]*rho_uV[2] + w[3]*rho_uV[3];
