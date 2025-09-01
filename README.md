@@ -34,8 +34,8 @@
 
 ## Résultats
 
-- ![Évolution de la forme](Figures/Convergence_Evolution_Shape.pdf)
-- ![Évolution de m et p](Figures/Convergence_m_p.pdf)
+- ![Évolution de la forme](Figures/Convergence_Evolution_Shape.png)
+- ![Évolution de m et p](Figures/Convergence_m_p.png)
 
 
 
