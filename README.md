@@ -16,14 +16,28 @@
 - Avancement en temps RK3 SSP.
 - Parallélisation OpenMP.
 
+
+
 ## Optimisation adjointe
 - Adjoint discret sans assemblage explicite de la jacobienne (matrix-free).
 - Résolution de l'adjoint avec Eigen BiCGSTAB.
 - Fonction objectif: $J = -C_L + \beta C_D$.
 - Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remaillage → ...
 
+
 ## Dépendances
 - Eigen (algèbre linéaire).
 - Gmsh (génération de maillages).
 - OpenMP (parallélisme CPU).
+
+
+
+## Résultats
+
+- ![Évolution de la forme](Figures/Convergence_Evolution_Shape.pdf)
+- ![Évolution de m et p](Figures/Convergence_m_p.pdf)
+
+
+
+
 
