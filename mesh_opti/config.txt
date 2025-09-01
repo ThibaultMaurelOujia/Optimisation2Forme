@@ -65,14 +65,14 @@ final_time   = 0.005
 
 
 
-state_load_path = mesh_opti/naca_2D_flow_33
-state_save_path = mesh_opti/naca_2D_flow_34
+state_load_path = mesh_opti/naca_2D_flow_0
+state_save_path = mesh_opti/naca_2D_flow_1
 
 shape_opt_enable = 1
-shape_param_file = mesh_opti/naca_2D_shape_params_33.txt
-shape_log_file = mesh_opti/shape_opt_33.log
+shape_param_file = mesh_opti/naca_2D_shape_params_0.txt
+shape_log_file = mesh_opti/shape_opt_0.log
 
-mesh_name = mesh_opti/naca_2D_shape_33.msh
+mesh_name = mesh_opti/naca_2D_shape_0.msh
 
 
 
