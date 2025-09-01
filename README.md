@@ -20,7 +20,7 @@
 - Adjoint discret sans assemblage explicite de matrice (matrix-free).
 - Résolution de l'adjoint avec Eigen BiCGSTAB.
 - Fonction objectif: $J = -C_L + \beta C_D$.
-- Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remeshing → ...…
+- Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remeshing → ...
 
 ## Dépendances
 - Eigen (l'algèbre linéaire).
