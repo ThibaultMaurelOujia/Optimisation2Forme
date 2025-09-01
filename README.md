@@ -23,7 +23,7 @@
 - Boucle : état direct → adjoint → gradient de forme → mise à jour géométrique → remeshing → ...
 
 ## Dépendances
-- Eigen (l'algèbre linéaire).
+- Eigen (algèbre linéaire).
 - Gmsh (génération de maillages).
 - OpenMP (parallélisme CPU).
 
